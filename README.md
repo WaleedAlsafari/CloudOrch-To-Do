@@ -4,7 +4,8 @@
 
 The project uses **ARM templates** and **Custom Script Extensions** to automatically provision and configure the entire environment:
 
-* **Frontend (React + Nginx)** on its own VM
+* **OS:** Ubuntu Linux (24.04 LTS) for all VMs  
+* **Frontend (React + Nginx)** on two VMs behind the Azure Load Balancer 
 * **Backend (Node.js + Express)** on a separate VM
 * **Database (PostgreSQL)** on a dedicated VM
 * **Azure Load Balancer** distributing traffic for high availability
