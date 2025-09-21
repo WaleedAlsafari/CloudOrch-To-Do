@@ -46,4 +46,6 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
      --template-file template.json \
      --parameters parameters.json
    ```
-   
+
+Once the deployment finishes successfully, copy the public IP address of the Load Balancer from the Azure Portal and paste it into a new browser tab to access the app.
+
