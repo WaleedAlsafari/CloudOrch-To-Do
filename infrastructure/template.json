@@ -1,0 +1,500 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmConfigurations": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "vmName": "frontend-vm1",
+                    "sku": "Standard_B1s",
+                    "networkInterface": "frontend-nic1",
+                    "subnet": "frontend",
+                    "nsg": "frontend-nsg1",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/CloudOrch-To-Do/refs/heads/main/scripts/frontendScripts.sh"
+                },
+                {
+                    "vmName": "frontend-vm2",
+                    "sku": "Standard_B1s",
+                    "networkInterface": "frontend-nic2",
+                    "subnet": "frontend",
+                    "nsg": "frontend-nsg2",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/CloudOrch-To-Do/refs/heads/main/scripts/frontendScripts.sh"
+                },
+                {
+                    "vmName": "backend-vm",
+                    "sku": "Standard_B2ats_v2",
+                    "networkInterface": "backend-nic",
+                    "subnet": "backend",
+                    "nsg": "backend-nsg",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/CloudOrch-To-Do/refs/heads/main/scripts/backendScripts.sh"
+                },
+                {
+                    "vmName": "database-vm",
+                    "sku": "Standard_B2ats_v2",
+                    "networkInterface": "database-nic",
+                    "subnet": "database",
+                    "nsg": "database-nsg",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/CloudOrch-To-Do/refs/heads/main/scripts/databaseScripts.sh"
+                }
+            ]
+        },
+        "location": {
+            "type": "string"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "todoapp-vnet"
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "StandardSSD_LRS"
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "vm-admin"
+        },
+        "adminPassword": {
+            "type": "secureString",
+            "minLength": 8
+        }
+    },
+
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2024-07-01",
+            "name": "[format('{0}/Allow-HTTP-80', parameters('vmConfigurations')[copyIndex()].nsg)]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "nsgRuleLoop",
+                "count": "[length(parameters('vmConfigurations'))]"
+            },
+            "condition": "[less(copyIndex('nsgRuleLoop'), 2)]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vmConfigurations')[copyIndex()].nsg)]"
+            ],
+            "properties": {
+                "priority": 100,
+                "access": "Allow",
+                "direction": "Inbound",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "80",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*"
+            }
+        },
+        {
+            "name": "[parameters('vmConfigurations')[copyIndex()].nsg]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-07-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+
+                ]
+            },
+            "copy": {
+                "name": "nsgLoop",
+                "count": "[length(parameters('vmConfigurations'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2024-07-01",
+            "name": "LoadB-ip",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "ipAddress": "74.225.184.167",
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": [],
+                "ddosSettings": {
+                    "protectionMode": "VirtualNetworkInherited"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2024-07-01",
+            "name": "todoapp-vnet",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "encryption": {
+                    "enabled": false,
+                    "enforcement": "AllowUnencrypted"
+                },
+                "privateEndpointVNetPolicies": "Disabled",
+                "subnets": [
+                    {
+                        "name": "frontend",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'frontend')]",
+                        "properties": {
+                            "addressPrefixes": [
+                                "10.0.0.0/24"
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "backend",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'backend')]",
+                        "properties": {
+                            "addressPrefixes": [
+                                "10.0.1.0/24"
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "database",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), 'database')]",
+                        "properties": {
+                            "addressPrefixes": [
+                                "10.0.2.0/24"
+                            ],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false
+            }
+        },
+        {
+            "name": "[parameters('vmConfigurations')[copyIndex()].vmName]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2024-03-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('vmConfigurations')[copyIndex()].networkInterface)]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmConfigurations')[copyIndex()].sku]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        },
+                        "deleteOption": "Delete"
+                    },
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "ubuntu-24_04-lts",
+                        "sku": "server",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('vmConfigurations')[copyIndex()].networkInterface)]",
+                            "properties": {
+                                "deleteOption": "Delete"
+                            }
+                        }
+                    ]
+                },
+                "securityProfile": {},
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmConfigurations')[copyIndex()].vmName]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "patchSettings": {
+                            "assessmentMode": "ImageDefault",
+                            "patchMode": "ImageDefault"
+                        }
+                    }
+                }
+            },
+            "copy": {
+                "name": "vmLoop",
+                "count": "[length(parameters('vmConfigurations'))]"
+            }
+        },
+
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2022-11-01",
+            "name": "[format('{0}/customScript', parameters('vmConfigurations')[copyIndex()].vmName)]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmConfigurations')[copyIndex()].vmName)]"
+            ],
+            "copy": {
+                "name": "customScriptLoop",
+                "count": "[length(parameters('vmConfigurations'))]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[parameters('vmConfigurations')[copyIndex()].scriptPath]"
+                    ],
+                    "commandToExecute": "[format('bash {0}', last(split(parameters('vmConfigurations')[copyIndex()].scriptPath, '/')))]"
+                }
+            }
+        },
+
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2024-07-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/backend')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefixes": [
+                    "10.0.1.0/24"
+                ],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2024-07-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/database')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefixes": [
+                    "10.0.2.0/24"
+                ],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2024-07-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/frontend')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefixes": [
+                    "10.0.0.0/24"
+                ],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2024-07-01",
+            "name": "[concat(parameters('virtualNetworkName'), '/GatewaySubnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "addressPrefixes": [
+                    "10.0.3.0/27"
+                ],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2024-07-01",
+            "name": "todoapp-LB",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'LoadB-ip')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "frontendIp-LB",
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'todoapp-LB'), '/frontendIPConfigurations/frontendIp-LB')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'LoadB-ip')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "backend-vms-pool",
+                        "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools','todoapp-LB', 'backend-vms-pool')]",
+                        "properties": {
+                            "loadBalancerBackendAddresses": [
+                                {
+                                    "name": "2b9da6a9-ecb1-4af4-ad55-0e1d8952f201",
+                                    "properties": {
+                                        "ipAddress": "10.0.0.4",
+                                        "virtualNetwork": {
+                                            "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "83aab5d9-8d7b-4fd7-adb1-638e208554ae",
+                                    "properties": {
+                                        "ipAddress": "10.0.0.5",
+                                        "virtualNetwork": {
+                                            "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "rule1",
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'todoapp-LB'), '/loadBalancingRules/rule1')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'todoapp-LB'), '/frontendIPConfigurations/frontendIp-LB')]"
+                            },
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 4,
+                            "protocol": "Tcp",
+                            "enableTcpReset": false,
+                            "loadDistribution": "Default",
+                            "disableOutboundSnat": true,
+                            "enableConnectionTracking": false,
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools','todoapp-LB', 'backend-vms-pool')]"
+                            },
+                            "backendAddressPools": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', 'todoapp-LB', 'backend-vms-pool')]"
+                                }
+                            ],
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'todoapp-LB'), '/probes/hprobe')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "hprobe",
+                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers','todoapp-LB'), '/probes/hprobe')]",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 1,
+                            "probeThreshold": 1,
+                            "noHealthyBackendsBehavior": "AllProbedDown"
+                        }
+                    }
+                ],
+                "inboundNatRules": [],
+                "outboundRules": [],
+                "inboundNatPools": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers/backendAddressPools",
+            "apiVersion": "2024-07-01",
+            "name": "[concat('todoapp-LB', '/backend-vms-pool')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/loadBalancers', 'todoapp-LB')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "loadBalancerBackendAddresses": [
+                    {
+                        "name": "2b9da6a9-ecb1-4af4-ad55-0e1d8952f201",
+                        "properties": {
+                            "ipAddress": "10.0.0.4",
+                            "virtualNetwork": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "83aab5d9-8d7b-4fd7-adb1-638e208554ae",
+                        "properties": {
+                            "ipAddress": "10.0.0.5",
+                            "virtualNetwork": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('vmConfigurations')[copyIndex()].networkInterface]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vmConfigurations')[copyIndex()].nsg)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'todoapp-vnet', parameters('vmConfigurations')[copyIndex()].subnet)]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ],
+                "enableAcceleratedNetworking": false,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('vmConfigurations')[copyIndex()].nsg)]"
+                }
+            },
+            "copy": {
+                "name": "networkInterfaceLoop",
+                "count": "[length(parameters('vmConfigurations'))]"
+            }
+        }
+    ]
+}

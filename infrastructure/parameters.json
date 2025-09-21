@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmConfigurations": {
+            "value": [
+                {
+                    "vmName": "frontend-vm1",
+                    "sku": "Standard_B1s",
+                    "networkInterface": "frontend-nic1",
+                    "subnet": "frontend",
+                    "nsg": "frontend-nsg1",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/Scalable-Cloud-Based-To-Do-App-with-Multi-VM-Architecture/refs/heads/main/scripts/frontendScripts.sh"
+                },
+                {
+                    "vmName": "frontend-vm2",
+                    "sku": "Standard_B1s",
+                    "networkInterface": "frontend-nic2",
+                    "subnet": "frontend",
+                    "nsg": "frontend-nsg2",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/Scalable-Cloud-Based-To-Do-App-with-Multi-VM-Architecture/refs/heads/main/scripts/frontendScripts.sh"
+                },
+                {
+                    "vmName": "backend-vm",
+                    "sku": "Standard_B2ats_v2",
+                    "networkInterface": "backend-nic",
+                    "subnet": "backend",
+                    "nsg": "backend-nsg",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/Scalable-Cloud-Based-To-Do-App-with-Multi-VM-Architecture/refs/heads/main/scripts/backendScripts.sh"
+                },
+                {
+                    "vmName": "database-vm",
+                    "sku": "Standard_B2ats_v2",
+                    "networkInterface": "database-nic",
+                    "subnet": "database",
+                    "nsg": "database-nsg",
+                    "scriptPath": "https://raw.githubusercontent.com/WaleedAlsafari/Scalable-Cloud-Based-To-Do-App-with-Multi-VM-Architecture/refs/heads/main/scripts/databaseScripts.sh"
+                }
+            ]
+        }, 
+        "osDiskType": {
+            "value": "StandardSSD_LRS"
+        },
+        "adminUsername": {
+            "value": "vm-admin"
+        }
+
+    }
+}
