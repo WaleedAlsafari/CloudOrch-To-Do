@@ -49,11 +49,38 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
 
 Once the deployment finishes successfully, copy the public IP address of the Load Balancer from the Azure Portal and paste it into a new browser tab to access the app.
 
-Note: You can't access the VMs that hold each server directly cause it's connceted to a private virtual network. In order to do so you have three options.
+## Accessing the Virtual Machines
 
-1: Azure Bostion 
+> **Note:** You can't access the VMs directly because they are connected to a **private virtual network** for security reasons.  
+> To connect to them, you have three options:
 
-2: Virtual Gateway (VPN)
+1. **Azure Bastion** *(Recommended)*  
+2. **Virtual Network Gateway (VPN)**  
+3. **Public IPs** *(Not recommended due to security risks)*
 
-3: Pulbic IPs (Not reccomennedd)
+---
+
+### Option 1: Using Azure Bastion (Recommended)
+
+Azure Bastion allows you to securely connect to your VMs **directly through the Azure Portal** — no need for public IPs or VPN setup.  
+It provides **browser-based RDP/SSH access** over SSL, keeping your VMs isolated within the private network.
+
+You can deploy the Bastion Host for this project using the button below:
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-ToDo%2Fmain%2Farm-templates%2Fbastion-template.json)
+
+---
+
+### After Deployment Succeeds
+
+1. Open the **Azure Portal** and go to your Resource Group (e.g., `todoapp-rg`).  
+2. Locate and open your **Bastion Host** resource (e.g., `bastion-todoapp`).  
+3. Click **Connect → Bastion** from the top menu.  
+4. Choose the **target VM** you want to access.  
+5. Select **RDP** (for Windows) or **SSH** (for Linux).  
+6. Enter the credentials you used when deploying the VM.  
+7. A browser-based remote session will open — **you’re now inside your VM securely!** 
+
+---
+
 
