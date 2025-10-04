@@ -49,7 +49,8 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
 
 Once the deployment finishes successfully, copy the public IP address of the Load Balancer from the Azure Portal and paste it into a new browser tab to access the app.
 
-## Accessing the Virtual Machines
+
+## Accessing the Virtual Machines for additional configuration
 
 > **Note:** You can't access the VMs directly because they are connected to a **private virtual network** for security reasons.  
 > To connect to them, you have three options:
@@ -73,13 +74,11 @@ You can deploy the Bastion Host for this project using the button below:
 
 ### After Deployment Succeeds
 
-1. Open the **Azure Portal** and go to your Resource Group (e.g., `todoapp-rg`).  
-2. Locate and open your **Bastion Host** resource (e.g., `bastion-todoapp`).  
-3. Click **Connect → Bastion** from the top menu.  
-4. Choose the **target VM** you want to access.  
-5. Select **RDP** (for Windows) or **SSH** (for Linux).  
-6. Enter the credentials you used when deploying the VM.  
-7. A browser-based remote session will open — **you’re now inside your VM securely!** 
+1. Open the **target VM** you want to connect to.  
+2. From the top menu, click **Connect → Bastion**.  
+3. Select **SSH** (because it's Linux-based).  
+4. Enter the VM’s username and password and then click **Connect**.  
+5. A new session will open in the browser  — **you’re now connected to your VM through Azure Bastion!** 
 
 ---
 
