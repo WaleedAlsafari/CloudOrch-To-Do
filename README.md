@@ -50,6 +50,7 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
 Once the deployment finishes successfully, copy the public IP address of the Load Balancer from the Azure Portal and paste it into a new browser tab to access the app.
 
 
+
 ## Accessing the Virtual Machines for additional configuration
 
 > **Note:** You can't access the VMs directly because they are connected to a **private virtual network** for security reasons.  
