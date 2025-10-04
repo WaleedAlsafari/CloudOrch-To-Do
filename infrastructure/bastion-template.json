@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-05-01",
+      "name": "bastion-ip",
+      "location": "centralindia",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2022-05-01",
+      "name": "todoapp-vnet/AzureBastionSubnet",
+      "location": "centralindia",
+      "properties": {
+        "addressPrefix": "10.0.4.0/26"
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "apiVersion": "2024-07-01",
+      "name": "bastion-todoapp",
+      "location": "centralindia",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'bastion-ip')]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'todoapp-vnet', 'AzureBastionSubnet')]"
+      ],
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "dnsName": "bst-80508306-db59-49d4-90bd-c217da48203b.bastion.azure.com",
+        "scaleUnits": 2,
+        "enableTunneling": false,
+        "enableIpConnect": false,
+        "disableCopyPaste": false,
+        "enableShareableLink": false,
+        "enableKerberos": false,
+        "enableSessionRecording": false,
+        "enablePrivateOnlyBastion": false,
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "id": "[concat(resourceId('Microsoft.Network/bastionHosts', 'bastion-todoapp'), '/bastionHostIpConfigurations/IpConf')]",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'bastion-ip')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'todoapp-vnet', 'AzureBastionSubnet')]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
