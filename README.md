@@ -49,3 +49,11 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
 
 Once the deployment finishes successfully, copy the public IP address of the Load Balancer from the Azure Portal and paste it into a new browser tab to access the app.
 
+Note: You can't access the VMs that hold each server directly cause it's connceted to a private virtual network. In order to do so you have three options.
+
+1: Azure Bostion 
+
+2: Virtual Gateway (VPN)
+
+3: Pulbic IPs (Not reccomennedd)
+
