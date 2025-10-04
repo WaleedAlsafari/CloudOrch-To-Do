@@ -68,7 +68,7 @@ It provides **browser-based RDP/SSH access** over SSL, keeping your VMs isolated
 
 You can deploy the Bastion Host for this project using the button below:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-ToDo%2Fmain%2Farm-templates%2Fbastion-template.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/WaleedAlsafari/CloudOrch-To-Do/refs/heads/main/infrastructure/bastion-template.json)
 
 ---
 
