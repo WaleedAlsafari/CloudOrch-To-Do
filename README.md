@@ -1,13 +1,13 @@
 # CloudOrch To-Do
 
-**CloudOrch To-Do** is not just another To-Do app — it’s a **cloud-infrastructure project** that highlights how to build and deploy a scalable application on Azure using **Infrastructure as Code (IaC)**.
+**CloudOrch To-Do** is not just another To-Do app — it’s a **cloud-infrastructure project** that focuses on how to build and deploy a scalable application on Azure using **Infrastructure as Code (IaC)**.
 
 The project uses **ARM templates** and **Custom Script Extensions** to automatically provision and configure the entire environment:
 
-* **OS:** Ubuntu Linux (24.04 LTS) for all VMs  
+* **OS:** Ubuntu Linux for all VMs  
 * **Frontend (React + Nginx)** on two VMs behind the Azure Load Balancer 
 * **Backend (Node.js + Express)** on a separate VM
-* **Database (PostgreSQL)** on a dedicated VM
+* **Database (PostgreSQL)** on a separate VM
 * **Azure Load Balancer** distributing traffic for high availability
 
 This demonstrates how IaC can be applied to create **reproducible, automated, and scalable cloud environments**.
