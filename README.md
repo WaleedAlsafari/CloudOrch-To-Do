@@ -26,8 +26,7 @@ This demonstrates how IaC can be applied to create **reproducible, automated, an
 
 Click the button below to deploy directly to your Azure subscription:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](
-https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Frefs%2Fheads%2Fmain%2Finfrastructure%2Ftemplate.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Frefs%2Fheads%2Fmain%2Finfrastructure%2Fbastion-template.json)
 
 
 ### Option 2: Deploy with Azure CLI
