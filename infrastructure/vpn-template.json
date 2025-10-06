@@ -6,13 +6,16 @@
             "type": "string"
         },
         "publicIPAddresses_vpn_ip_name": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "vpn-ip"
         },
         "virtualNetworks_todoapp_vnet_name": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "todoapp-vnet"
         },
         "virtualNetworkGateways_todoapp_vpn_name": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "todoapp-vpn"
         },
         "rootCertData": {
             "type": "string"
