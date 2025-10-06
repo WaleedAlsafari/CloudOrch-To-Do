@@ -87,9 +87,36 @@ You can deploy the Bastion Host for this project using the button below:
 
 You can deploy the Azure **Virtual Network Gateway** (VPN) template directly to your subscription by clicking the button below:
 
+Before deployment:
+1. Run the folowing two commands respectively to generate root and client certificate used for authenticate your device with the VPN:
+
+$cert = New-SelfSignedCertificate `
+  -Type Custom `
+  -KeySpec Signature `
+  -Subject "CN=RootCert" `
+  -KeyExportPolicy Exportable `
+  -HashAlgorithm sha256 `
+  -KeyLength 2048 `
+  -CertStoreLocation "Cert:\CurrentUser\My" `
+  -KeyUsageProperty Sign `
+  -KeyUsage CertSign
+
+  New-SelfSignedCertificate `
+  -Type Custom `
+  -DnsName "ClientCert" `
+  -KeySpec Signature `
+  -Subject "CN=ClientCert" `
+  -KeyExportPolicy Exportable `
+  -HashAlgorithm sha256 `
+  -KeyLength 2048 `
+  -CertStoreLocation "Cert:\CurrentUser\My" `
+  -Signer $cert `
+  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.2")
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Fmain%2Finfrastructure%2Fvpn-template.json)
 
-After deployment, you can:
+After deployment:
+1. Install the **Azure VPN Client** app from Microsoft Store
 1. Open the created **Virtual Network Gateway**.  
 2. Navigate to **Point-to-site configuration** → **Download VPN client**.  
 3. Install the client on your device and connect securely to your VNet.
