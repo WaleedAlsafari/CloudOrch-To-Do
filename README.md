@@ -87,7 +87,7 @@ You can deploy the Bastion Host for this project using the button below:
 
 You can deploy the Azure **Virtual Network Gateway** (VPN) template directly to your subscription by clicking the button below:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Fmain%2Finfrastructure%2Fvgatewaytemplate.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Fmain%2Finfrastructure%2Fvpn-template.json)
 
 After deployment, you can:
 1. Open the created **Virtual Network Gateway**.  
