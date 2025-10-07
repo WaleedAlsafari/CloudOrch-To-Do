@@ -101,7 +101,8 @@ $cert = New-SelfSignedCertificate `
   -CertStoreLocation "Cert:\CurrentUser\My" `
   -KeyUsageProperty Sign `
   -KeyUsage CertSign
-
+```
+```powershell
 New-SelfSignedCertificate `
   -Type Custom `
   -DnsName "ClientCert" `
@@ -113,7 +114,8 @@ New-SelfSignedCertificate `
   -CertStoreLocation "Cert:\CurrentUser\My" `
   -Signer $cert `
   -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.2")
-  
+```
+
   2. After two commands complete successfully, go to the search bar and search for "Manage user certificate"
   3. Open the program, then go to Persoanl -> Certificate folder.
   4. You will see the two generated certificate Root and Client.
