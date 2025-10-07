@@ -91,27 +91,37 @@ Before deployment:
 1. Run the folowing two commands respectively to generate root and client certificate used for authenticate your device with the VPN:
 
 $cert = New-SelfSignedCertificate `
-  -Type Custom `
-  -KeySpec Signature `
-  -Subject "CN=RootCert" `
-  -KeyExportPolicy Exportable `
-  -HashAlgorithm sha256 `
-  -KeyLength 2048 `
-  -CertStoreLocation "Cert:\CurrentUser\My" `
-  -KeyUsageProperty Sign `
-  -KeyUsage CertSign
+    -Type Custom `
+    -KeySpec Signature `
+    -Subject "CN=RootCert" `
+    -KeyExportPolicy Exportable `
+    -HashAlgorithm sha256 `
+    -KeyLength 2048 `
+    -CertStoreLocation "Cert:\CurrentUser\My" `
+    -KeyUsageProperty Sign `
+    -KeyUsage CertSign
 
-  New-SelfSignedCertificate `
-  -Type Custom `
-  -DnsName "ClientCert" `
-  -KeySpec Signature `
-  -Subject "CN=ClientCert" `
-  -KeyExportPolicy Exportable `
-  -HashAlgorithm sha256 `
-  -KeyLength 2048 `
-  -CertStoreLocation "Cert:\CurrentUser\My" `
-  -Signer $cert `
-  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.2")
+
+New-SelfSignedCertificate `
+    -Type Custom `
+    -DnsName "ClientCert" `
+    -KeySpec Signature `
+    -Subject "CN=ClientCert" `
+    -KeyExportPolicy Exportable `
+    -HashAlgorithm sha256 `
+    -KeyLength 2048 `
+    -CertStoreLocation "Cert:\CurrentUser\My" `
+    -Signer $cert `
+    -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.2")
+
+  
+  2. After two commands complete successfully, go to the search bar and search for "Manage user certificate"
+  3. Open the program, then go to Persoanl -> Certificate folder.
+  4. You will see the two generated certificate Root and Client.
+  5. Right click on the Root certificate then go to All Tasks -> Export 
+  6. A wizard will open, select "No, do no export the private key" then "Base-64 encoded X.509 (.CER)" laslty specify the path for storing the exported root certificate.
+  7. Go to the location you specified for the exported root certificate and open it as Notpad.
+  8. Copy the public key inside the certificate and paste it in the required field during deployment of VPN 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Fmain%2Finfrastructure%2Fvpn-template.json)
 
@@ -119,7 +129,11 @@ After deployment:
 1. Install the **Azure VPN Client** app from Microsoft Store
 1. Open the created **Virtual Network Gateway**.  
 2. Navigate to **Point-to-site configuration** → **Download VPN client**.  
-3. Install the client on your device and connect securely to your VNet.
+3. After installation completed, extract the zipped file.
+4. Open the **Azure VPN Client** app, click the **+** sign and select **import**
+5. Navigate and select "azurevpnconfig" file.
+6. Click save and then you can connect successfully to VPN.
+7. Laslty you can ssh to any vm server you want to configure.
 
 ---
 
