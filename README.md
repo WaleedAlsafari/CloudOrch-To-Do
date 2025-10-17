@@ -56,9 +56,8 @@ Once the deployment finishes successfully, copy the public IP address of the Loa
 > **Note:** You can't access the VMs directly because they are connected to a **private virtual network** for security reasons.  
 > To connect to them, you have three options:
 
-1. **Azure Bastion** *(Recommended)*  
+1. **Azure Bastion**  
 2. **Virtual Network Gateway (VPN)**  
-3. **Public IPs** *(Not recommended due to security risks)*
 
 ---
 
@@ -80,6 +79,61 @@ You can deploy the Bastion Host for this project using the button below:
 3. Select **SSH** (because it's Linux-based).  
 4. Enter the VM’s username and password and then click **Connect**.  
 5. A new session will open in the browser  — **you’re now connected to your VM through Azure Bastion!**
+
+---
+
+### Option 2: Using Virtual Network Gateway (VPN)
+
+You can deploy the Azure **Virtual Network Gateway** (VPN) template directly to your subscription by clicking the button below:
+
+Before deployment:
+1. Run the folowing two commands in Powershell respectively to generate root and client certificate used for authenticate your device with the VPN:
+
+```powershell
+$cert = New-SelfSignedCertificate `
+  -Type Custom `
+  -KeySpec Signature `
+  -Subject "CN=RootCert" `
+  -KeyExportPolicy Exportable `
+  -HashAlgorithm sha256 `
+  -KeyLength 2048 `
+  -CertStoreLocation "Cert:\CurrentUser\My" `
+  -KeyUsageProperty Sign `
+  -KeyUsage CertSign
+```
+```powershell
+New-SelfSignedCertificate `
+  -Type Custom `
+  -DnsName "ClientCert" `
+  -KeySpec Signature `
+  -Subject "CN=ClientCert" `
+  -KeyExportPolicy Exportable `
+  -HashAlgorithm sha256 `
+  -KeyLength 2048 `
+  -CertStoreLocation "Cert:\CurrentUser\My" `
+  -Signer $cert `
+  -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.2")
+```
+
+  2. After two commands complete successfully, go to the search bar and search for "Manage user certificate"
+  3. Open the program, then go to Persoanl -> Certificate folder.
+  4. You will see the two generated certificate Root and Client.
+  5. Right click on the Root certificate then go to All Tasks -> Export 
+  6. A wizard will open, select "No, do no export the private key" then "Base-64 encoded X.509 (.CER)" laslty specify the path for storing the exported root certificate.
+  7. Go to the location you specified for the exported root certificate and open it as Notpad.
+  8. Copy the public key inside the certificate and paste it in the required field during deployment of VPN 
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FWaleedAlsafari%2FCloudOrch-To-Do%2Fmain%2Finfrastructure%2Fvpn-template.json)
+
+After deployment:
+1. Install the **Azure VPN Client** app from Microsoft Store
+1. Open the created **Virtual Network Gateway**.  
+2. Navigate to **Point-to-site configuration** → **Download VPN client**.  
+3. After installation completed, extract the zipped file.
+4. Open the **Azure VPN Client** app, click the **+** sign and select **import**
+5. Navigate and select "azurevpnconfig" file.
+6. Click save and then you can connect successfully to VPN.
+7. Laslty you can ssh to any vm server you want to configure.
 
 ---
 
