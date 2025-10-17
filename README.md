@@ -192,4 +192,7 @@ After deployment:
 
 ---
 
+## Acknowledgment
+
+This project is based on the original work from [PERN-ToDo-App](https://github.com/vickytilotia/PERN-ToDo-App).
 
